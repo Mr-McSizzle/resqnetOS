@@ -1,135 +1,70 @@
-It seems your current view doesn't render Markdown formatting, causing you to see the raw code instead of formatted text.
+# ResQNetOS
 
-Here is the same README content formatted as plain text for easier reading. When you save this as a README.md file on GitHub, it will display with the proper headings and bold text.
+**Simulation-first infrastructure for resilient autonomous drone-swarm missions.**
 
-AEROSKY OS 🚁
+ResQNetOS is a hackathon prototype exploring how multi-drone systems can coordinate missions using **ROS 2, PX4, and Gazebo**, with an emphasis on extensibility and degraded-connectivity operation.
 
-THE OPEN-SOURCE OPERATING SYSTEM FOR DRONE SWARMS
+## Core idea
 
-AeroSky OS is a simulation-first, open-source platform for controlling autonomous drone swarms. Conceived as an "Android for the Sky," our mission is to democratize advanced drone technology for critical applications like emergency response, search and rescue, and logistics, with a special focus on tackling the unique environmental and connectivity challenges of India.
+Instead of treating each drone as a one-off application, ResQNetOS treats swarm behavior as an operating layer: mission logic sits above the flight stack and can be extended through reusable applications.
 
-This repository contains the hackathon prototype, demonstrating the core OS, a sample mission application, and a proof-of-concept app marketplace.
+```text
+Mission application
+       ↓
+ResQNetOS coordination layer
+       ↓
+ROS 2 messaging / mission logic
+       ↓
+PX4 flight control
+       ↓
+Gazebo simulation / vehicle
+```
 
-== KEY FEATURES ==
+## Repository scope
 
-Swarms on Demand: Built on the robust foundations of PX4 Autopilot and ROS 2, enabling complex multi-drone coordination.
+This repository contains the prototype software and setup material used to demonstrate the concept in simulation. The current implementation is **not a production flight-control system** and should not be interpreted as hardware-validated swarm autonomy.
 
-Thriving App Ecosystem: A framework designed for a plug-and-play app ecosystem. Developers can contribute open-source mission apps or offer premium solutions through a marketplace.
+## Technology
 
-India-Specific Design: Includes modules for integrating IMD weather data to navigate monsoon conditions and planned support for LoRa/SQLite for operations in low-connectivity rural areas.
+- Ubuntu 24.04 LTS
+- ROS 2 Jazzy
+- PX4 Autopilot / SITL
+- Gazebo
+- Python
+- Flask for the prototype application marketplace
 
-Simulation-First: Develop, test, and validate complex swarm missions in the Gazebo Simulator without risking hardware.
+## Running the simulation
 
-Freemium "Sky" Standard: A free, open-source core (Apache 2.0) for the community, with a path to monetization through a premium app marketplace for enterprise users.
+The exact local setup depends on the PX4 / ROS 2 environment. The intended demo flow is:
 
-== TECH STACK ==
+1. Launch a PX4 SITL vehicle in Gazebo.
+2. Start the communication bridge / ROS 2 environment.
+3. Verify estimator and vehicle readiness.
+4. Run a mission application through the ROS 2 workspace.
 
-Operating System: Ubuntu 24.04 LTS
+Example PX4 simulation command:
 
-Core Middleware: ROS 2 Jazzy Jalisco
-
-Flight Controller: PX4 Autopilot (SITL)
-
-Simulator: Gazebo
-
-App Development: Python 3
-
-Marketplace PoC: Flask
-
-== GETTING STARTED ==
-
-Prerequisites:
-
-A fresh installation of Ubuntu 24.04 LTS.
-
-Git
-
-Installation:
-All dependencies and setup steps can be installed by running a single script.
-
-COMMANDS:
-# Clone this repository
-git clone https://github.com/your-username/aerosky-os.git
-cd aerosky-os
-
-# Run the setup script to install all dependencies (ROS 2, PX4, etc.)
-./setup.sh
-== RUNNING THE HACKATHON DEMO ==
-
-To demonstrate the full potential of AeroSky OS, follow this execution order precisely across four separate terminals.
-
-TERMINAL 1: Launch the Simulator
-This runs the drone and the virtual world.
-
-COMMANDS:
-# Navigate to the PX4 directory installed by the setup script
+```bash
 cd ~/PX4-Autopilot
-
-# Launch the Gazebo simulator with a drone
 make px4_sitl gz_x500
-(Wait for the pxh> prompt to appear before proceeding.)
+```
 
-TERMINAL 2: Start the Communication Bridge
-This connects the simulator to ROS 2.
+Then source the ROS 2 workspace and run the mission package configured by the project.
 
-COMMANDS:
-# Source the ROS 2 environment
-source /opt/ros/jazzy/setup.bash
+## Design goals
 
-# Start the Micro-ROS agent
-micrortps_agent -t UDP
-TERMINAL 3: Verify Drone Readiness
-This is a critical step to ensure the drone is ready to fly.
+- **Simulation first** — test mission logic without risking hardware.
+- **Modular missions** — separate reusable mission applications from the underlying flight stack.
+- **Resilience** — explore local autonomy and mission continuity when connectivity is unreliable.
+- **Extensibility** — make it possible to add domain-specific swarm behaviors without rebuilding the entire stack.
 
-Wait 15-20 seconds after starting the bridge.
+## Current limitations
 
-Go back to Terminal 1 and type the following at the pxh> prompt:
+- The repository represents a hackathon-stage prototype.
+- Hardware flight testing is outside the scope of the current codebase.
+- LoRa / rural-connectivity support and some resilience mechanisms described in the original concept remain roadmap items.
+- Safety-critical deployment would require extensive hardware-in-the-loop testing, formal failure handling, and operational validation.
 
-COMMAND:
-ekf2 status
+## Direction
 
-(Wait until the output shows global position: 1 and the health flags are true.)
-
-Disable the GCS safety check for the simulation:
-
-COMMANDS:
-param set NAV_DLL_ACT 0
-param save
-
-TERMINAL 4: Run the Mission App
-This runs the sample "takeoff and land" application.
-
-COMMANDS:
-# Navigate to your ROS 2 workspace
-cd ~/aerosky_ws
-
-# Source the workspace
-source install/setup.bash
-
-# Run the mission!
-ros2 run autopilot_app mission_runner
-You should now see the drone take off, hover, and land in the Gazebo window!
-
-== THE APP ECOSYSTEM ==
-
-AeroSky OS is designed to be extended through apps.
-
-Community Apps: Developers can create their own mission scripts using our autopilot_app as a template. We encourage contributions for missions like search patterns, image capture, and more.
-
-Premium Marketplace: Our proof-of-concept Flask web app demonstrates how enterprise users could purchase certified, high-performance apps for specialized tasks.
-
-== ROADMAP ==
-
-[ ] Hardware integration and testing on a physical drone.
-
-[ ] Full implementation of IMD weather API for real-time storm avoidance.
-
-[ ] Develop advanced swarm logic for formation flying.
-
-[ ] Build out the full Flask marketplace with user authentication.
-
-[ ] Integrate LoRa hardware for testing offline communication links.
-
-== LICENSE ==
-
-This project is licensed under the Apache 2.0 License. See the LICENSE file for details.
+ResQNetOS is ultimately an experiment in **software-defined autonomy**: giving drone fleets a common mission layer that can survive imperfect infrastructure and support multiple real-world applications.
