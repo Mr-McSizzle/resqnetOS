@@ -4,21 +4,20 @@
 
 ResQNetOS is a hackathon prototype exploring how multi-drone systems can coordinate missions using **ROS 2, PX4, and Gazebo**, with an emphasis on extensibility and degraded-connectivity operation.
 
+## Core architecture
+
+```mermaid
+flowchart TD
+    A[Mission application] --> B[ResQNetOS coordination layer]
+    B --> C[ROS 2 messaging + mission logic]
+    C --> D[PX4 flight control]
+    D --> E[Gazebo / vehicle simulation]
+    B -. degraded connectivity .-> F[Local mission continuity]
+```
+
 ## Core idea
 
 Instead of treating each drone as a one-off application, ResQNetOS treats swarm behavior as an operating layer: mission logic sits above the flight stack and can be extended through reusable applications.
-
-```text
-Mission application
-       ↓
-ResQNetOS coordination layer
-       ↓
-ROS 2 messaging / mission logic
-       ↓
-PX4 flight control
-       ↓
-Gazebo simulation / vehicle
-```
 
 ## Repository scope
 
